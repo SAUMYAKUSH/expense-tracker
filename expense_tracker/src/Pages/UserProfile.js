@@ -1,10 +1,14 @@
- import React, { useContext, useRef, useState } from 'react'
+ import React, { useContext, useEffect, useRef, useState } from 'react'
  import AuthContext from '../Store/AuthContext';
  import {Form, Row, Col, Button} from "react-bootstrap";
+import { Nav } from 'react-bootstrap/esm';
 
  const UserProfile = () => {
 
-    const [loading, setLoading] = useState();
+    const [loading, setLoading] = useState(false);
+    let initialProfileState = localStorage.getItem("profileCompleted");
+    const [profileCompleted, setProfileCompleted] = useState(initialProfileState);
+    const [userDetails, setUserDetails] = useState([]);
     const authCxt = useContext(AuthContext);
     const token = authCxt.token;
     const nameRef = useRef('');
@@ -28,7 +32,8 @@
                     returnSecureToken: false,
                 }),
                 headers:{'Content-type ': 'application/json'}
-            })
+             }
+            );
             if(!response.ok){
                 let errorMessage =await response.json();
                 console.log('error response', errorMessage);
@@ -36,19 +41,69 @@
 
             }
             const data = await response.json();
+            setProfileCompleted(true);
+            localStorage.setItem("profileCompleted", "true");
             console.log(data);
-        }catch(error){
+         } catch(error){
             console.log(error);
+            setProfileCompleted(false);
+            localStorage.setItem("profileCompleted", "false");
             alert('Error Occurred', error);
         }finally{
             setLoading(false);
         }
-    }
+    };
+      useEffect(()=>{
+        setLoading(true);
+        const fetchUserDetails = async ()=>{
+            try {
+                const response = await fetch(
+                    "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyBN1Y4fgRQH6KhdNjrr4aXpDQ5BVtVvBbY",{
+                        method: "Post",
+                        body: JSON.stringify({
+                            IdToken: token,
+                        }),
+                        headers:{"Content-Type": "application/json"},
+                    }
+                );
+                if(!response.ok){
+                    const errorMessage = await response.json();
+                    console.log("errorMessage", errorMessage);
+                    throw new Error(errorMessage);
+                }
+                const data = await response.json();
+                console.log("data", data);
+                //Check if User exists in the data
+                if(data && Array.isArray(data.users)){
+                    //Update state with the 'users array           
+                     setUserDetails(data.users);
+                }else{
+                    console.log("Invalid data format from Firebase");
+
+                } 
+            }catch(error){
+                console.log('failed to fetch data', error);
+
+            }finally{
+                setLoading(false);
+            }
+            if(authCxt.isLoggedIn){
+                fetchUserDetails();
+            } else {
+                setLoading(false);
+            }
+        }
+    },[authCxt.isLoggedIn])
+
    return (
      <div>
-         <header className="mb-4">
-        <p>Winners never quit, quitters never win.</p>
-      </header>
+         <Nav className="justify-content-between">
+        <p style={{padding:"20px"}}>Winners never quit, quitters never win.</p>
+        {!profileCompleted? (<p className='ml-auto' style={{padding:"20px"}}>
+            Your Profile is InComplete. Profile with 100%
+            <br/> Complete Profiles have higher chances of getting job.
+        </p>):(<p style={{padding:"20px"}}>Your Profile Is Completed</p>)}
+      </Nav>
       <div className="container text-center mt-5">
         <h3>Contact Details</h3>
 
@@ -82,6 +137,13 @@
             </Col>
           </Row>
         </Form>
+        <ul>
+            {userDetails.map((detail)=>(
+                <li key={detail.id}>
+                    email: {detail.email} - displayName:{detail.displayName} - photoUrl: {detail.photoUrl} - emailVerified:{detail.emailVerified} - lastLoginAt:{detail.lastLoginAt}
+                </li>
+            ))}
+        </ul>
       </div>
      </div>
    );
