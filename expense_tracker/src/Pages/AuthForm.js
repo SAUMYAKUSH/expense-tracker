@@ -2,7 +2,8 @@ import React, { useContext, useRef, useState } from 'react';
 import ErrorModal from "../Components/UI/ErrorModal";
 import "./AuthForm.css";
 import AuthContext from "../Store/AuthContext";
-import { useNavigate } from 'react-router-dom';
+import {useHistory,Link} from "react-router-dom"
+// import {Link} from "react-router-dom"
 
 const AuthForm = () => {
   const [login,setLogin] = useState(true);
@@ -10,7 +11,7 @@ const AuthForm = () => {
   const [error,setError] = useState(null);
 
   const authCxt = useContext(AuthContext);
-  const navigate = useNavigate();
+  const history = useHistory();
   
   const passwordRef = useRef("");
   const emailRef = useRef("");
@@ -49,7 +50,7 @@ const AuthForm = () => {
     const  enteredEmail = emailRef.current.value;
     const enteredPassword = passwordRef.current.value;
     const enteredConfirmPass = confirmPassRef.current.value;
-
+    console.log(emailRef.current.value)
     const inputError = validateInputs(
       enteredPassword,
       enteredConfirmPass,
@@ -84,7 +85,7 @@ const AuthForm = () => {
       const data = await response.json();
       console.log(data);
       authCxt.login(data.idToken, data.email);
-     navigate('/');
+     history.replace('/');
     } catch(error){
       alert(error.message);
     }finally{
@@ -127,6 +128,7 @@ const AuthForm = () => {
           )}
                     {!isLoading && (<button type="submit">{login ? "LogIn" : "Create Account"}</button>)}
                     {isLoading && <p>Sending Request...</p>}
+                    <Link to="/verifyPasswordChange">Forgot Password</Link>
         </form>
         <button
           className="switch"

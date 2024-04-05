@@ -1,16 +1,20 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
  const AuthContext = React.createContext({
     token:'',
     isLoggedIn: false,
     email:'',
-    login:(token)=>{},
+    login:(token, mail)=>{},
     logout:()=>{},
+    sendVerification:()=>{}, 
+
  })
  export const AuthContextProvider = (props)=>{
     const initialToken = localStorage.getItem('token');
     const initialEmail = localStorage.getItem('email');
     const [token, setToken] = useState(initialToken);
     const [userEmail, setUserEmail] = useState(initialEmail);
+    const navigate = useHistory();
     const userIsLoggedIn = !!token;
     const userLoginHandler = (token,userEmail)=>{
         setToken(token);
