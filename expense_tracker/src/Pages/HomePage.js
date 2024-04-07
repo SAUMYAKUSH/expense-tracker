@@ -1,6 +1,6 @@
 import React from 'react';
 import { Nav} from 'react-bootstrap';
-import { Link } from 'react-router-dom/dist';
+import { Link } from 'react-router-dom';
 
 const HomePage = () => {
   return (

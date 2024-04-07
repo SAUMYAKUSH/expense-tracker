@@ -18,10 +18,10 @@ const App = () => {
       <Switch>
       
         <Route exact path='/'>{authCxt.isLoggedIn ? <HomePage/> : <Redirect to ='/auth'/>} </Route>
-        <Route path='/profile'>{authCxt.isLoggedIn? <UserProfile/> : <Redirect to='/auth'/>}</Route>
-        <Route path='/trackExpense'>{authCxt.isLoggedIn? <ExpenseTrack/>: <Redirect to='/auth'/>}</Route>
+        <Route path='/profile'>{authCxt.isLoggedIn? <UserProfile/> : <Redirect to='/auth'/>}</Route> 
+        <Route path='/trackExpense'>{authCxt.isLoggedIn? <ExpenseTrack/>: <Redirect to='/auth'/>}</Route>  
        {!authCxt.isLoggedIn && (<Route path="/auth"><AuthForm/></Route>)}
-       {!authCxt.isLoggedIn && (<Route path="/verifyPasswordChange"><VerifyPasswordChange/></Route>)}
+       {!authCxt.isLoggedIn && (<Route path="/verifyPasswordChange"><VerifyPasswordChange/></Route>)} 
         
         </Switch>
     </div>

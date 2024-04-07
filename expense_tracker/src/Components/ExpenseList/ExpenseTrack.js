@@ -1,5 +1,6 @@
-import React, { useRef, useState } from 'react'
-import { Row,Button,FloatingLabel, Col, Form } from 'react-bootstrap';
+import React, { useContext, useRef, useState } from 'react'
+import { Row,Button,FloatingLabel, Col, Form, Spinner, Card} from 'react-bootstrap';
+import ExpenseContext from '../../Store/ExpenseContext';
 
 
 
@@ -8,6 +9,7 @@ const ExpenseTrack = () => {
     const moneyRef = useRef();
     const descriptionRef = useRef("");
     const categoryRef = useRef("");
+    const expenseCxt = useContext(ExpenseContext);
 
     const formSubmitHandler=(event) =>{
         event.preventDefault();
@@ -22,9 +24,7 @@ const ExpenseTrack = () => {
             description: enteredDescription,
             category: enteredCategory,
         };
-        setExpense((prevExpense)=>{
-            return [...prevExpense,data];
-        });
+       expenseCxt.addExpense(data);
         moneyRef.current.value ="";
         descriptionRef.current.value = "";
         categoryRef.current.value = "select";
@@ -68,13 +68,21 @@ const ExpenseTrack = () => {
       </Row>
       <Button type='submit' onClick={formSubmitHandler} style={{width:"100px", display:"block", margin:"auto"}}>Submit</Button>
       <div className='container text-center mt-5'>
-        <ul>
-            {expense.map((item)=>(
-                <li key={item.id}>
-                    In {item.category}: Money Spent = {item.money} - Descripton = {item.description}
-                </li>
+        {expenseCxt.isLoading && <Spinner animation="border"/>}
+        <ul style={{width: "70%", marginLeft: "11rem"}}>
+            {expenseCxt.expenses.map((item)=>(
+                <Card key={item.id} className="text-center" style={{marginTop: "20px", marginBottom:"50px"}}>
+                    <Card.Header>Rs.{item.money}</Card.Header>
+                    <Card.Body>
+                        <Card.Title>{item.category}</Card.Title>
+                        <Card.Text>{item.description}</Card.Text>
+                    </Card.Body>
+                    <Card.Footer className="text-mutes">This Year</Card.Footer>
+                </Card>
             ))}
         </ul>
+        <Button onClick={expenseCxt.deleteExpense} variant="outline-danger"
+        style={{width: "60%"}}>Delete Expenses</Button>
       </div>
     </div>
   );
