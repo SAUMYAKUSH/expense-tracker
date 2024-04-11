@@ -3,7 +3,7 @@ import ErrorModal from "../Components/UI/ErrorModal";
 import "./AuthForm.css";
 import AuthContext from "../Store/AuthContext";
 import {useHistory,Link} from "react-router-dom"
-// import {Link} from "react-router-dom"
+
 
 const AuthForm = () => {
   const [login,setLogin] = useState(true);
@@ -65,12 +65,12 @@ const AuthForm = () => {
     try{
       let url;
       if(login){
-        url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBN1Y4fgRQH6KhdNjrr4aXpDQ5BVtVvBbY";
+        url =  "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCRLO00hJ5etUWEEIWrl2co5zDEvbP7CQ4";
       } else{
-        url= "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBN1Y4fgRQH6KhdNjrr4aXpDQ5BVtVvBbY";
+        url="https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCRLO00hJ5etUWEEIWrl2co5zDEvbP7CQ4";   
       }
       const response = await fetch(url,{
-        method:"Post",
+        method:"POST",
         body: JSON.stringify({
           email: enteredEmail,
           password: enteredPassword,

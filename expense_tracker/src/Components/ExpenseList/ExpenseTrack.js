@@ -9,7 +9,9 @@ const ExpenseTrack = () => {
     const moneyRef = useRef();
     const descriptionRef = useRef("");
     const categoryRef = useRef("");
+
     const expenseCxt = useContext(ExpenseContext);
+    const [editingExpense, setEditingExpense] = useState(null);
 
     const formSubmitHandler=(event) =>{
         event.preventDefault();
@@ -23,12 +25,27 @@ const ExpenseTrack = () => {
             money: enteredMoney,
             description: enteredDescription,
             category: enteredCategory,
+            
         };
-       expenseCxt.addExpense(data);
+        
+       
+        if(editingExpense) {
+          expenseCxt.editExpense(editingExpense.id, data);
+          setEditingExpense(null);
+        } else {
+          expenseCxt.addExpense(data);
+        }
+
         moneyRef.current.value ="";
         descriptionRef.current.value = "";
         categoryRef.current.value = "select";
     };
+    const startEditHandler = (expense)=>{
+      setEditingExpense(expense);
+      moneyRef.current.value = expense.money;
+      descriptionRef.current.value = expense.description;
+      categoryRef.current.value = expense.category;
+    }
   return (
     <div>
       <div className='container text-center mt-5'>
@@ -66,7 +83,7 @@ const ExpenseTrack = () => {
           </FloatingLabel>
         </Col>
       </Row>
-      <Button type='submit' onClick={formSubmitHandler} style={{width:"100px", display:"block", margin:"auto"}}>Submit</Button>
+      <Button type='submit' onClick={formSubmitHandler} style={{width:"100px", display:"block", margin:"auto"}}>{editingExpense? "Update": "Submit"}</Button>
       <div className='container text-center mt-5'>
         {expenseCxt.isLoading && <Spinner animation="border"/>}
         <ul style={{width: "70%", marginLeft: "11rem"}}>
@@ -76,6 +93,8 @@ const ExpenseTrack = () => {
                     <Card.Body>
                         <Card.Title>{item.category}</Card.Title>
                         <Card.Text>{item.description}</Card.Text>
+                        <Button onClick={()=> startEditHandler(item)} variant='outline-warning' style={{width: "20%", margin: "10px"}}> Edit Expenses</Button>
+                        <Button onClick={()=> expenseCxt.deleteParticularExpense(item.id)} variant='outline-danger' style={{width: "20%"}}> Delete Expenses</Button>
                     </Card.Body>
                     <Card.Footer className="text-mutes">This Year</Card.Footer>
                 </Card>
