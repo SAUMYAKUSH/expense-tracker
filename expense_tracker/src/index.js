@@ -5,18 +5,17 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import "../node_modules/bootstrap/dist/css/bootstrap.css";
 import { BrowserRouter } from 'react-router-dom';
-import { AuthContextProvider } from './Store/AuthContext';
-import { ExpenseContextProvider } from './Store/ExpenseContext';
+import {Provider} from 'react-redux';
+import store from './Store/store';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <AuthContextProvider>
-      <ExpenseContextProvider>  
+      <Provider store={store}>
        <BrowserRouter>
         <App/>
       </BrowserRouter> 
-        </ExpenseContextProvider> 
-     </AuthContextProvider> 
+      </Provider>
     
   </React.StrictMode>
 );
