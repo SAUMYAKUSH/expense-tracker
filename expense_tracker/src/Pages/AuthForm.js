@@ -1,43 +1,43 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, {  useRef, useState } from 'react';
 import ErrorModal from "../Components/UI/ErrorModal";
 import "./AuthForm.css";
-import AuthContext from "../Store/AuthContext";
-import {useHistory,Link} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom";
+import {useDispatch} from "react-redux";
+import {authActions} from "../Store/auth";
 
 
 const AuthForm = () => {
-  const [login,setLogin] = useState(true);
+  const [isLogin,setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error,setError] = useState(null);
 
-  const authCxt = useContext(AuthContext);
-  const history = useHistory();
-  
+  const dispatch = useDispatch();
+  const navigate =useNavigate();  
   const passwordRef = useRef("");
   const emailRef = useRef("");
   const confirmPassRef = useRef("");
 
   const switchAuthModeHandler=()=>{
-    setLogin((prevState)=> !prevState);
+    setIsLogin((prevState)=> !prevState);
   };
   const closeErrorHandler=()=>{
     setError(null);
   };
 
-  const validateInputs =(password, confirmPass, isLogin)=>{
-     if(isLogin && password.trim().length<6){
+  const validateInputs =(password, confirmPass, Login)=>{
+     if(Login && password.trim().length<6){
       return{
         title: "Invalid input",
         message:"Please enter a password with a minimum of 6 characters",
       }
      }
-     if(!isLogin && password.trim().length<6){
+     if(!Login && password.trim().length<6){
       return{
         title:"Invalid password",
         message:"Please enter a password with a minimum of 6 characters",
       }
      }
-     if(!isLogin && password !== confirmPass){
+     if(!Login && password !== confirmPass){
       return{
         title:"Invalid password",
         message:"Password should be the same as confirm password",
@@ -50,11 +50,11 @@ const AuthForm = () => {
     const  enteredEmail = emailRef.current.value;
     const enteredPassword = passwordRef.current.value;
     const enteredConfirmPass = confirmPassRef.current.value;
-    console.log(emailRef.current.value)
+    
     const inputError = validateInputs(
       enteredPassword,
       enteredConfirmPass,
-      login 
+      isLogin 
     );
     if(inputError){
       setError(inputError);
@@ -64,7 +64,7 @@ const AuthForm = () => {
     setIsLoading(true);
     try{
       let url;
-      if(login){
+      if(isLogin){
         url =  "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCRLO00hJ5etUWEEIWrl2co5zDEvbP7CQ4";
       } else{
         url="https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCRLO00hJ5etUWEEIWrl2co5zDEvbP7CQ4";   
@@ -84,15 +84,14 @@ const AuthForm = () => {
       }
       const data = await response.json();
       console.log(data);
-      authCxt.login(data.idToken, data.email);
-     history.replace('/');
+      localStorage.setItem("token", data.idToken);
+      dispatch(authActions.login({bearerToken: data.idToken, userId: data.localId}))
+      navigate("/");
+      navigate(0);
     } catch(error){
       alert(error.message);
     }finally{
       setIsLoading(false);
-      if(!login){
-        console.log("User has Successfully Signed Up!")
-      }
     }
   };
   return (
@@ -105,7 +104,7 @@ const AuthForm = () => {
             onConfirm={closeErrorHandler}
           />
         )}
-        <h1 className="heading">{login ? "LogIn" : "SignUp"}</h1>
+        <h1 className="heading">{isLogin ? "LogIn" : "SignUp"}</h1>
         <form onSubmit={formSubmitHandler}>
           <div>
             <label htmlFor="email">Email</label>
@@ -115,7 +114,7 @@ const AuthForm = () => {
             <label htmlFor="password">Password</label>
             <input id="password" type="password" ref={passwordRef} required />
           </div>
-          {!login && (
+          {!isLogin && (
             <div>
               <label htmlFor="confirmPass"> Confirm password</label>
               <input
@@ -126,7 +125,7 @@ const AuthForm = () => {
               />
             </div>
           )}
-                    {!isLoading && (<button type="submit">{login ? "LogIn" : "Create Account"}</button>)}
+                    {!isLoading && (<button type="submit">{isLogin ? "LogIn" : "Create Account"}</button>)}
                     {isLoading && <p>Sending Request...</p>}
                     <Link to="/verifyPasswordChange">Forgot Password</Link>
         </form>
@@ -135,7 +134,7 @@ const AuthForm = () => {
           type="button"
           onClick={switchAuthModeHandler}
         >
-          {login ? "Don't have Account? SignUp" : "Have an Account? Login"}
+          {isLogin ? "Don't have Account? SignUp" : "Have an Account? Login"}
         </button>
       </section>
     </div>

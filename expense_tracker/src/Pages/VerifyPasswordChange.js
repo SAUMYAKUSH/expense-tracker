@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { useHistory} from 'react-router-dom';
+import {useNavigation} from "react-router-dom";
 
 const VerifyPasswordChange = () => {
     const [isLoading, setIsLoading] = useState();
     const [userMail, setUserMail] = useState("");
-    const history = useHistory();
+    const navigate = useNavigation();
 
     const mailHandler = (event)=>{
         setUserMail(event.target.value);
@@ -29,7 +29,8 @@ const VerifyPasswordChange = () => {
          setIsLoading(false);
          console.log(data);
          setTimeout(()=>{
-            history.push('/auth');
+            navigate('/auth');
+            navigate(0);
          },10000);
         } catch(error){
             console.log(error);

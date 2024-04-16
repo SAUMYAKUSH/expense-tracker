@@ -1,21 +1,34 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../Store/AuthContext';
+import React from 'react';
 import {Navbar,Container,Nav, Button} from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
+import {useDispatch} from "react-redux";
+import { authActions } from '../../Store/auth';
+
 const NavBar = () => {
-    const authCxt = useContext(AuthContext);
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const logoutHandler = () =>{
+    localStorage.removeItem("token");
+    dispatch(authActions.logout());
+    navigate("/auth");
+    navigate(0);
+  }
+  console.log(token);
   return (
     <div>
        <Navbar bg="light" data-bs-theme="light">
         <Container>
           <Navbar.Brand>Expense Tracker</Navbar.Brand>
           <Nav className="me-auto">
-           {authCxt.isLoggedIn && <Link to="/" className='nav-link'>Home</Link>}
-           {authCxt.isLoggedIn && <Link to="/about" className='nav-link'>About</Link>}
-           {authCxt.isLoggedIn && <Link to="/contactUs" className='nav-link'>Contact Us</Link>}
-           {authCxt.isLoggedIn && <Link to="/trackExpense" className='nav-link'>Track</Link>}
-           {!authCxt.isLoggedIn && <Link to="/auth" className='nav-link'>Login</Link>}
-           {authCxt.isLoggedIn && <Button variant="outline-secondary" style={{marginLeft: '900px'}} onClick={() => authCxt.logout()}>Logout</Button>}
+           {token && <Link to="/" className='nav-link'>Home</Link>}
+           {token && <Link to="/about" className='nav-link'>About</Link>}
+           {token && <Link to="/contactUs" className='nav-link'>Contact Us</Link>}
+           {token && <Link to="/trackExpense" className='nav-link'>Track</Link>}
+           {!token && <Link to="/auth" className='nav-link'>Login</Link>}
+           {token && <Button variant="outline-secondary" style={{marginLeft: '650px'}} onClick={logoutHandler}>Logout</Button>}
           </Nav>
         </Container>
       </Navbar>
@@ -23,4 +36,4 @@ const NavBar = () => {
   )
 }
 
-export default NavBar
+export default NavBar;

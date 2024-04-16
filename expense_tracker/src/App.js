@@ -1,32 +1,30 @@
-import React,{useContext} from 'react';
+import React from 'react';
 import AuthForm from './Pages/AuthForm';
 import NavBar from './Components/NavBar/NavBar';
-import { Route, Redirect,Switch,BrowserRouter as Router} from "react-router-dom";
+import {Route, BrowserRouter as Router, Routes} from "react-router-dom";
 import HomePage from "./Pages/HomePage";
-import AuthContext from "./Store/AuthContext";
 import UserProfile from './Pages/UserProfile';
 import VerifyPasswordChange from './Pages/VerifyPasswordChange';
 import ExpenseTrack from './Components/ExpenseList/ExpenseTrack';
 
 const App = () => {
-  const authCxt = useContext(AuthContext);
+  const token = localStorage.getItem("token");
   return (
     <Router>
-    <div>
+    
       <NavBar/>
 
-      <Switch>
-      
-        <Route exact path='/'>{authCxt.isLoggedIn ? <HomePage/> : <Redirect to ='/auth'/>} </Route>
-        <Route path='/profile'>{authCxt.isLoggedIn? <UserProfile/> : <Redirect to='/auth'/>}</Route> 
-        <Route path='/trackExpense'>{authCxt.isLoggedIn? <ExpenseTrack/>: <Redirect to='/auth'/>}</Route>  
-       {!authCxt.isLoggedIn && (<Route path="/auth"><AuthForm/></Route>)}
-       {!authCxt.isLoggedIn && (<Route path="/verifyPasswordChange"><VerifyPasswordChange/></Route>)} 
+      <Routes>
+      {token? (<Route path='/' element={<HomePage/>}/>):(<Route path='/auth' element={<AuthForm/>}/>)}
+      {token ? (<Route path='/profile' element={<UserProfile/>}/>) : (<Route path="/auth" element={<AuthForm/>}/>)}
+      {token ? (<Route path='/trackexpense' element={<ExpenseTrack/>}/>) : (<Route path="/auth" element={<AuthForm/>}/>)} 
+      {!token && (<Route path="/auth" element={<AuthForm/>}/>)}
+      {!token && (<Route path="/verifyPasswordChange" element={<VerifyPasswordChange/>}/>)} 
         
-        </Switch>
-    </div>
+        </Routes>
+    
     </Router>
   )
 }
 
-export default App
+export default App;

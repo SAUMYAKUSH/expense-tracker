@@ -1,5 +1,5 @@
- import React, { useContext, useEffect, useRef, useState } from 'react'
- import AuthContext from '../Store/AuthContext';
+ import React, {  useEffect, useRef, useState } from 'react'
+ 
  import {Form, Row, Col, Button} from "react-bootstrap";
 import { Nav } from 'react-bootstrap/esm';
 
@@ -9,8 +9,8 @@ import { Nav } from 'react-bootstrap/esm';
     let initialProfileState = localStorage.getItem("profileCompleted");
     const [profileCompleted, setProfileCompleted] = useState(initialProfileState);
     const [userDetails, setUserDetails] = useState([]);
-    const authCxt = useContext(AuthContext);
-    const token = authCxt.token;
+    
+    const token = localStorage.getItem("token");
     const nameRef = useRef('');
     const photoRef = useRef('');
 
@@ -87,13 +87,13 @@ import { Nav } from 'react-bootstrap/esm';
             }finally{
                 setLoading(false);
             }
-            if(authCxt.isLoggedIn){
+            if(token){
                 fetchUserDetails();
             } else {
                 setLoading(false);
             }
         }
-    },[authCxt.isLoggedIn])
+    },[token])
 
    return (
      <div>
